@@ -51,5 +51,5 @@ resource "helm_release" "aws_lbc" {
       }
     })
   ]
-  depends_on = [aws_eks_node_group.general, helm_release.cluster_autoscaler]
+  depends_on = [aws_eks_node_group.general, helm_release.cluster_autoscaler, aws_vpc.main, aws_subnet.private_zone1, aws_subnet.private_zone2, aws_subnet.public_zone1, aws_subnet.private_zone2]
 }

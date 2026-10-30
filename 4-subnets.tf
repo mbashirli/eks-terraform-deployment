@@ -43,6 +43,7 @@ resource "aws_subnet" "public_zone2" {
 
   tags = {
     "Name"                                                 = "${local.env}-public-${local.zone2}"
+    "kubernetes.io/role/elb"                               = "1"
     "kubernetes.io/cluster/${local.env}-${local.eks_name}" = "owned"
   }
 }
