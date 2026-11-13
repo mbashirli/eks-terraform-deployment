@@ -37,11 +37,11 @@ data "aws_iam_policy_document" "efs_csi_driver" {
 
 resource "aws_iam_role" "efs_csi_driver" {
   assume_role_policy = data.aws_iam_policy_document.efs_csi_driver.json
-  name = "${aws_eks_cluster.eks.name}-efs-csi-driver"
+  name               = "${aws_eks_cluster.eks.name}-efs-csi-driver"
 }
 
 resource "aws_iam_role_policy_attachment" "efs_csi_driver" {
-  role = aws_iam_role.efs_csi_driver.name
+  role       = aws_iam_role.efs_csi_driver.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
 }
 
@@ -59,24 +59,24 @@ resource "helm_release" "efs_csi_driver" {
       value = "efs-csi-controller-sa"
     },
     {
-        name = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-        value = aws_iam_role.efs_csi_driver.arn
+      name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = aws_iam_role.efs_csi_driver.arn
     }
   ]
 
-  depends_on = [ aws_efs_mount_target.zone_a, aws_efs_mount_target.zone_b ]
+  depends_on = [aws_efs_mount_target.zone_a, aws_efs_mount_target.zone_b]
 }
 
 data "aws_eks_cluster" "eks_v2" {
-    name = aws_eks_cluster.eks.name
+  name = aws_eks_cluster.eks.name
 }
 
 data "aws_eks_cluster_auth" "eks_v2" {
-    name = aws_eks_cluster.eks.name
+  name = aws_eks_cluster.eks.name
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.eks_v2.endpoint
+  host = data.aws_eks_cluster.eks_v2.endpoint
   cluster_ca_certificate = base64decode(
     data.aws_eks_cluster.eks_v2.certificate_authority[0].data
   )
@@ -93,10 +93,10 @@ resource "kubernetes_storage_class_v1" "efs" {
 
   parameters = {
     provisioningMode = "efs-ap"
-    fileSystemId = aws_efs_file_system.efs.id
-    directoryPerms = "700"
+    fileSystemId     = aws_efs_file_system.efs.id
+    directoryPerms   = "700"
   }
 
   mount_options = ["iam"]
-  depends_on = [ helm_release.efs_csi_driver ]
+  depends_on    = [helm_release.efs_csi_driver]
 }
